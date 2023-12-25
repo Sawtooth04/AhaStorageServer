@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 //@EnableWebSecurity
-public class SecurityConfiguration {
+public class AppConfiguration {
     @Value("${cors.allowed-origins}")
     private String[] corsAllowedOrigins;
 
