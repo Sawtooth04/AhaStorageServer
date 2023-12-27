@@ -1,6 +1,7 @@
 package com.sawtooth.ahastorageserver.services.systemmanager;
 
 import com.sawtooth.ahastorageserver.models.chunk.ChunkUploadModel;
+import com.sawtooth.ahastorageserver.models.systeminfo.SystemInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,13 @@ public class SystemManager implements ISystemManager{
     @Override
     public boolean IsAbleToUploadChunk(ChunkUploadModel uploadModel) {
         return uploadModel.data().length + GetChunksFolderSize() <= chunksFolderMaxSize;
+    }
+
+    @Override
+    public SystemInfo GetSystemInfo() {
+        return new SystemInfo(
+            chunksFolderMaxSize,
+            GetChunksFolderSize()
+        );
     }
 }

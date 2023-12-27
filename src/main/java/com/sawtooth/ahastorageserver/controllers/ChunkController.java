@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/chunk")
@@ -31,37 +33,39 @@ public class ChunkController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<ChunkDownloadModel> Get(@RequestParam String name) {
+    @Async
+    public CompletableFuture<ResponseEntity<ChunkDownloadModel>> Get(@RequestParam String name) {
         try {
             byte[] chunk = chunksReader.Read(name);
             ChunkDownloadModel result = new ChunkDownloadModel(chunk);
 
             result.add(linkTo(methodOn(ChunkController.class).Get(name)).withSelfRel());
             if (chunk != null)
-                return ResponseEntity.status(HttpStatus.OK).body(result);
+                return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
             else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
         }
         catch (IOException exception) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
         }
     }
 
     @PutMapping("/put")
-    public ResponseEntity<RepresentationModel<?>> Put(@RequestBody ChunkUploadModel uploadModel) {
+    @Async
+    public CompletableFuture<ResponseEntity<RepresentationModel<?>>> Put(@RequestBody ChunkUploadModel uploadModel) {
         RepresentationModel<?> result = new RepresentationModel<>();
 
         try {
             if (systemManager.IsAbleToUploadChunk(uploadModel)) {
                 chunksLoader.PutChunk(uploadModel);
-                result.add(linkTo(methodOn(ChunkController.class).Get(uploadModel.name())).withSelfRel());
-                return ResponseEntity.status(HttpStatus.OK).body(result);
+                result.add(linkTo(methodOn(ChunkController.class).Get(uploadModel.name())).withRel("get"));
+                return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
             }
             else
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
+                return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.FORBIDDEN).body(result));
         }
         catch (IOException exception) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result));
         }
     }
 }
