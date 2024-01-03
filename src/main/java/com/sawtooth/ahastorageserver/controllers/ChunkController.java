@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.sawtooth.ahastorageserver.models.chunk.ChunkDownloadModel;
 import com.sawtooth.ahastorageserver.models.chunk.ChunkUploadModel;
+import com.sawtooth.ahastorageserver.services.chunksdeleter.IChunksDeleter;
 import com.sawtooth.ahastorageserver.services.chunksloader.IChunksLoader;
 import com.sawtooth.ahastorageserver.services.chunksreader.IChunksReader;
 import com.sawtooth.ahastorageserver.services.systemmanager.ISystemManager;
@@ -23,12 +24,15 @@ import java.util.concurrent.CompletableFuture;
 public class ChunkController {
     private final IChunksLoader chunksLoader;
     private final IChunksReader chunksReader;
+    private final IChunksDeleter chunksDeleter;
     private final ISystemManager systemManager;
 
     @Autowired
-    public ChunkController(IChunksLoader chunksLoader, IChunksReader chunksReader, ISystemManager systemManager) {
+    public ChunkController(IChunksLoader chunksLoader, IChunksReader chunksReader, IChunksDeleter chunksDeleter,
+        ISystemManager systemManager) {
         this.chunksLoader = chunksLoader;
         this.chunksReader = chunksReader;
+        this.chunksDeleter = chunksDeleter;
         this.systemManager = systemManager;
     }
 
@@ -67,5 +71,15 @@ public class ChunkController {
         catch (IOException exception) {
             return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result));
         }
+    }
+
+    @DeleteMapping("/delete/{name}")
+    @Async
+    public CompletableFuture<ResponseEntity<RepresentationModel<?>>> Delete(@PathVariable String name) {
+        RepresentationModel<?> result = new RepresentationModel<>();
+
+        if (chunksDeleter.Delete(name))
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
+        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result));
     }
 }
