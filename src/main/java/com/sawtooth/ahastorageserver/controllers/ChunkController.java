@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.sawtooth.ahastorageserver.models.chunk.ChunkDownloadModel;
+import com.sawtooth.ahastorageserver.models.chunk.ChunkLastModifiedResponse;
 import com.sawtooth.ahastorageserver.models.chunk.ChunkUploadModel;
 import com.sawtooth.ahastorageserver.services.chunksdeleter.IChunksDeleter;
 import com.sawtooth.ahastorageserver.services.chunksloader.IChunksLoader;
@@ -81,5 +82,21 @@ public class ChunkController {
         if (chunksDeleter.Delete(name))
             return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
         return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result));
+    }
+
+    @GetMapping("/get/modified")
+    @Async
+    public CompletableFuture<ResponseEntity<ChunkLastModifiedResponse>> GetModified(@RequestParam String name) {
+        ChunkLastModifiedResponse result = new ChunkLastModifiedResponse();
+
+        result.add(linkTo(methodOn(ChunkController.class).Get(name)).withRel("chunk-get"));
+        result.add(linkTo(methodOn(ChunkController.class).Delete(name)).withRel("chunk-delete"));
+        try {
+            result.setData(chunksReader.GetLastModifiedTimestamp(name));
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
+        }
+        catch (Exception exception) {
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        }
     }
 }

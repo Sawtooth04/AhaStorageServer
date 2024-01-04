@@ -26,6 +26,7 @@ public class MainController {
         result.add(linkTo(methodOn(ChunkController.class).Get(null)).withRel("chunk-get"));
         result.add(linkTo(methodOn(ChunkController.class).Put(null)).withRel("chunk-put"));
         result.add(linkTo(methodOn(ChunkController.class).Delete(null)).withRel("chunk-delete"));
+        result.add(linkTo(methodOn(ChunkController.class).GetModified(null)).withRel("chunk-modified-get"));
 
         return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
     }
