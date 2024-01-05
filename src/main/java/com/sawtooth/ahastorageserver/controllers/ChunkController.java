@@ -39,6 +39,7 @@ public class ChunkController {
 
     @GetMapping("/get")
     @Async
+    @ResponseBody
     public CompletableFuture<ResponseEntity<ChunkDownloadModel>> Get(@RequestParam String name) {
         try {
             byte[] chunk = chunksReader.Read(name);
@@ -57,6 +58,7 @@ public class ChunkController {
 
     @PutMapping("/put")
     @Async
+    @ResponseBody
     public CompletableFuture<ResponseEntity<RepresentationModel<?>>> Put(@RequestBody ChunkUploadModel uploadModel) {
         RepresentationModel<?> result = new RepresentationModel<>();
 
@@ -76,6 +78,7 @@ public class ChunkController {
 
     @DeleteMapping("/delete/{name}")
     @Async
+    @ResponseBody
     public CompletableFuture<ResponseEntity<RepresentationModel<?>>> Delete(@PathVariable String name) {
         RepresentationModel<?> result = new RepresentationModel<>();
 
@@ -86,6 +89,7 @@ public class ChunkController {
 
     @GetMapping("/get/modified")
     @Async
+    @ResponseBody
     public CompletableFuture<ResponseEntity<ChunkLastModifiedResponse>> GetModified(@RequestParam String name) {
         ChunkLastModifiedResponse result = new ChunkLastModifiedResponse();
 
