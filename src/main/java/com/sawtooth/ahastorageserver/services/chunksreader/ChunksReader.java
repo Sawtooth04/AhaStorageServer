@@ -27,4 +27,9 @@ public class ChunksReader implements IChunksReader {
     public long GetLastModifiedTimestamp(String name) {
         return (new File(Path.of(chunksFolder, name).toString())).lastModified();
     }
+
+    @Override
+    public boolean IsChunkExists(String name) {
+        return (new File(Path.of(chunksFolder, name).toString())).exists();
+    }
 }

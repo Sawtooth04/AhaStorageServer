@@ -37,10 +37,10 @@ public class ChunkController {
         this.systemManager = systemManager;
     }
 
-    @GetMapping("/get")
+    @GetMapping("/get/{name}")
     @Async
     @ResponseBody
-    public CompletableFuture<ResponseEntity<ChunkDownloadModel>> Get(@RequestParam String name) {
+    public CompletableFuture<ResponseEntity<ChunkDownloadModel>> Get(@PathVariable String name) {
         try {
             byte[] chunk = chunksReader.Read(name);
             ChunkDownloadModel result = new ChunkDownloadModel(chunk);
@@ -54,6 +54,19 @@ public class ChunkController {
         catch (IOException exception) {
             return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
         }
+    }
+
+    @GetMapping("/get/{name}/exists")
+    @Async
+    @ResponseBody
+    public CompletableFuture<ResponseEntity<RepresentationModel<?>>> GetExists(@PathVariable String name) {
+        RepresentationModel<?> result = new RepresentationModel<>();
+
+        result.add(linkTo(methodOn(ChunkController.class).Get(name)).withRel("get"));
+        if (chunksReader.IsChunkExists(name))
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
+        else
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PutMapping("/put")
