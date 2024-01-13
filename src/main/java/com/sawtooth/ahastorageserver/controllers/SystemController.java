@@ -1,5 +1,6 @@
 package com.sawtooth.ahastorageserver.controllers;
 
+import com.sawtooth.ahastorageserver.models.systeminfo.Space;
 import com.sawtooth.ahastorageserver.models.systeminfo.SystemInfo;
 import com.sawtooth.ahastorageserver.services.systemmanager.ISystemManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,21 @@ public class SystemController {
         this.systemManager = systemManager;
     }
 
-    @GetMapping("/info/get")
+    @GetMapping("/info")
     @Async
     public CompletableFuture<ResponseEntity<SystemInfo>> GetInfo() {
         SystemInfo result = systemManager.GetSystemInfo();
 
         result.add(linkTo(methodOn(SystemController.class).GetInfo()).withSelfRel());
+        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
+    }
+
+    @GetMapping("/space")
+    @Async
+    public CompletableFuture<ResponseEntity<Space>> GetSpace() {
+        Space result = systemManager.GetFreeSpace();
+
+        result.add(linkTo(methodOn(SystemController.class).GetSpace()).withSelfRel());
         return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.OK).body(result));
     }
 }

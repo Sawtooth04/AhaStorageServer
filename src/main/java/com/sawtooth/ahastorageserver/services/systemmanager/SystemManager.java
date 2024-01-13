@@ -1,6 +1,7 @@
 package com.sawtooth.ahastorageserver.services.systemmanager;
 
 import com.sawtooth.ahastorageserver.models.chunk.ChunkUploadModel;
+import com.sawtooth.ahastorageserver.models.systeminfo.Space;
 import com.sawtooth.ahastorageserver.models.systeminfo.SystemInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,15 @@ public class SystemManager implements ISystemManager{
             chunksFolderMaxSize,
             GetChunksFolderSize()
         );
+    }
+
+    @Override
+    public Space GetFreeSpace() {
+        Space space = new Space();
+
+        System.out.println((new File(chunksFolder)).length());
+        space.freeSpace = (chunksFolderMaxSize - GetChunksFolderSize()) / Math.pow(1024, 5);
+        space.totalSpace = chunksFolderMaxSize / Math.pow(1024, 5);
+        return space;
     }
 }

@@ -23,6 +23,7 @@ public class MainController {
 
         result.add(linkTo(methodOn(MainController.class).Main()).withSelfRel());
         result.add(linkTo(methodOn(SystemController.class).GetInfo()).withRel("system-info"));
+        result.add(linkTo(methodOn(SystemController.class).GetSpace()).withRel("space"));
         result.add(linkTo(methodOn(ChunkController.class).Get(null)).withRel("chunk-get"));
         result.add(linkTo(methodOn(ChunkController.class).GetExists(null)).withRel("chunk-exists-get"));
         result.add(linkTo(methodOn(ChunkController.class).Put(null)).withRel("chunk-put"));
