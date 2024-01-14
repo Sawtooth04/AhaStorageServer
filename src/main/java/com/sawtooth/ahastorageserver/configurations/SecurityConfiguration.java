@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -17,7 +18,8 @@ public class SecurityConfiguration {
             (authorize) -> authorize.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                 .anyRequest().permitAll()
             ).csrf(csrf -> csrf
-                /*.ignoringRequestMatchers("/**")*/
+                //.ignoringRequestMatchers("/**")
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             );
         return http.build();
